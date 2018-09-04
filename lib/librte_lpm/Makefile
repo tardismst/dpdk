@@ -26,6 +26,8 @@ else ifeq ($(CONFIG_RTE_ARCH_X86),y)
 SYMLINK-$(CONFIG_RTE_LIBRTE_LPM)-include += rte_lpm_sse.h
 else ifeq ($(CONFIG_RTE_ARCH_PPC_64),y)
 SYMLINK-$(CONFIG_RTE_LIBRTE_LPM)-include += rte_lpm_altivec.h
+else ifeq ($(CONFIG_RTE_ARCH_S390X),y)
+SYMLINK-$(CONFIG_RTE_LIBRTE_LPM)-include += rte_lpm_s390x.h
 endif
 
 include $(RTE_SDK)/mk/rte.lib.mk

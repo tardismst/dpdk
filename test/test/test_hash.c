@@ -818,7 +818,6 @@ fbk_hash_unit_test(void)
 	if (tmp != NULL)
 		rte_fbk_hash_free(tmp);
 	RETURN_IF_ERROR_FBK(tmp != NULL, "fbk hash creation should have failed");
-
 	/* we are not freeing  handle here because we need a hash list
 	 * to be not empty for the next test */
 
@@ -852,17 +851,25 @@ fbk_hash_unit_test(void)
 	RETURN_IF_ERROR_FBK((unsigned)used_entries != 0, \
 				"load factor right after creation is not zero but it should be");
 	/* Add keys. */
+	//printf("add keys\n");
 	for (i = 0; i < 5; i++) {
+		//printf("init val = %u, hash func=%u, bucket mask=%u, bucket shift=%u\n",handle->init_val,handle->hash_func(keys[i], handle->init_val), handle->bucket_mask,handle->bucket_shift);
 		status = rte_fbk_hash_add_key(handle, keys[i], vals[i]);
+		//uint32_t blah = rte_fbk_hash_get_bucket(handle, keys[i]);
+                //printf("i=%u, vals[i]=%u, status=%d, bucket=%u\n",i, vals[i], status, blah);
 		RETURN_IF_ERROR_FBK(status != 0, "fbk hash add failed");
 	}
 
 	used_entries = rte_fbk_hash_get_load_factor(handle) * LOCAL_FBK_HASH_ENTRIES_MAX;
 	RETURN_IF_ERROR_FBK((unsigned)used_entries != (unsigned)((((double)5)/LOCAL_FBK_HASH_ENTRIES_MAX)*LOCAL_FBK_HASH_ENTRIES_MAX), \
 				"load factor now is not as expected");
+        //printf("lookup keys\n");
+
 	/* Find value of added keys. */
 	for (i = 0; i < 5; i++) {
 		status = rte_fbk_hash_lookup(handle, keys[i]);
+		//uint32_t blah = rte_fbk_hash_get_bucket(handle, keys[i]);
+		//printf("i=%u, vals[i]=%u, status=%d, bucket=%u\n",i, vals[i], status, blah);
 		RETURN_IF_ERROR_FBK(status != vals[i],
 				"fbk hash lookup failed");
 	}
