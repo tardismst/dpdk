@@ -142,11 +142,21 @@ transition4(xmm_t next_input, const uint64_t *trans,
 	dfa_msk = vec_cmpeq(node_type, t);
 
 	/* DFA calculations. */
-	r = vec_srl(in, (vector_bool_int){30, 30, 30, 30});
+	//r = vec_srl(in, (vector_bool_int){30, 30, 30, 30});
+	r[0] = in[0] >> 30;
+	r[1] = in[1] >> 30;
+	r[2] = in[2] >> 30;
+	r[3] = in[3] >> 30;
+
 	tp = (xmm_t *)&s390x_acl_const.range_base.u32;
 	r = r + *tp;
 	//r = (xmm_t)vec_addc((vector_bool_int)r, (vector_bool_int)*tp); //needs to be unsigned int
-	t = vec_srl(in, (vector_bool_int){24, 24, 24, 24});
+	//t = vec_srl(in, (vector_bool_int){24, 24, 24, 24});
+	t[0] = in[0] >> 24;
+	t[1] = in[1] >> 24;
+	t[2] = in[2] >> 24;
+	t[3] = in[3] >> 24;
+
 	r = vec_perm(tr_hi, (xmm_t){(uint16_t)0 << 16},
 		(vector_unsigned_char)r);
 
@@ -203,8 +213,15 @@ transition4(xmm_t next_input, const uint64_t *trans,
 	v.d64[1] = (uint64_t)trans[addr[3]];
 	*indices2 = (xmm_t){v.d32[0], v.d32[1], v.d32[2], v.d32[3]};
 
-	return vec_srl(next_input,
-		(vector_bool_int){CHAR_BIT, CHAR_BIT, CHAR_BIT, CHAR_BIT});
+	next_input[0] = next_input[0] >> CHAR_BIT;
+	next_input[1] = next_input[1] >> CHAR_BIT;
+	next_input[2] = next_input[2] >> CHAR_BIT;
+	next_input[3] = next_input[3] >> CHAR_BIT;
+
+	return next_input;
+
+	//return vec_srl(next_input,
+	//	(vector_bool_int){CHAR_BIT, CHAR_BIT, CHAR_BIT, CHAR_BIT});
 }
 
 /*

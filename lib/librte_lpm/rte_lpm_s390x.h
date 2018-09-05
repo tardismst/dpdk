@@ -19,7 +19,6 @@ rte_lpm_lookupx4(const struct rte_lpm *lpm, xmm_t ip, uint32_t hop[4],
 	uint32_t defv)
 {
         typedef int vector_signed_int __attribute__ (( vector_size(4*sizeof(int)) ));
-        typedef unsigned int vector_unsigned_int __attribute__ (( vector_size(4*sizeof(unsigned int)) ));
 	vector_signed_int i24;
 	rte_xmm_t i8;
 	uint32_t tbl[4];
@@ -46,8 +45,10 @@ rte_lpm_lookupx4(const struct rte_lpm *lpm, xmm_t ip, uint32_t hop[4],
 		(uint64_t)RTE_LPM_LOOKUP_SUCCESS << 32);
 
 	/* get 4 indexes for tbl24[]. */
-	i24 = vec_srl((xmm_t) ip,
-		(vector_unsigned_int){CHAR_BIT, CHAR_BIT, CHAR_BIT, CHAR_BIT});
+        i24[0]=(uint32_t)ip[0] >> 8;
+        i24[1]=(uint32_t)ip[1] >> 8;
+        i24[2]=(uint32_t)ip[2] >> 8;
+        i24[3]=(uint32_t)ip[3] >> 8;
 
 	/* extract values from tbl24[] */
 	idx = (uint32_t)i24[0];

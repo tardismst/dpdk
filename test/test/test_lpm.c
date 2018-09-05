@@ -392,7 +392,7 @@ test8(void)
 
 		ipx4 = vect_set_epi32(ip2, ip1, ip2, ip1);
 		rte_lpm_lookupx4(lpm, ipx4, hop, UINT32_MAX);
-		printf("add: depth=%u,hop[0]=0x%x, hop[1]=0x%x, hop[2]=0x%x, hop[3]=0x%x\n", depth,hop[0], hop[1], hop[2], hop[3]);
+		//printf("add: depth=%u,hop[0]=0x%x, hop[1]=0x%x, hop[2]=0x%x, hop[3]=0x%x\n", depth,hop[0], hop[1], hop[2], hop[3]);
 		TEST_LPM_ASSERT(hop[0] == UINT32_MAX);
 		TEST_LPM_ASSERT(hop[1] == next_hop_add);
 		TEST_LPM_ASSERT(hop[2] == UINT32_MAX);

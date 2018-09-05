@@ -163,11 +163,20 @@ desc_to_olflags_v(vector_unsigned_long_long descs[4], struct rte_mbuf **rx_pkts)
 					(vector_unsigned_char){},
 					*(vector_unsigned_char *)&vlan1);
 
-	rss = vec_srl(vlan1, (vector_unsigned_int){11, 11, 11, 11});
+	//rss = vec_srl(vlan1, (vector_unsigned_int){11, 11, 11, 11});
+	rss[0] = (uint32_t)vlan1[0] >> 11;
+	rss[1] = (uint32_t)vlan1[1] >> 11;
+	rss[2] = (uint32_t)vlan1[2] >> 11;
+	rss[3] = (uint32_t)vlan1[3] >> 11;
 	rss = (vector_unsigned_int)vec_perm(rss_flags, (vector_unsigned_char){},
 					*(vector_unsigned_char *)&rss);
 
-	l3_l4e = vec_srl(vlan1, (vector_unsigned_int){22, 22, 22, 22});
+	//l3_l4e = vec_srl(vlan1, (vector_unsigned_int){22, 22, 22, 22});
+	l3_l4e[0] = (uint32_t)vlan1[0] >> 22;
+	l3_l4e[1] = (uint32_t)vlan1[1] >> 22;
+	l3_l4e[2] = (uint32_t)vlan1[2] >> 22;
+	l3_l4e[3] = (uint32_t)vlan1[3] >> 22;
+
 	l3_l4e = (vector_unsigned_int)vec_perm(l3_l4e_flags,
 					(vector_unsigned_char){},
 					*(vector_unsigned_char *)&l3_l4e);
@@ -190,8 +199,13 @@ desc_to_ptype_v(vector_unsigned_long_long descs[4], struct rte_mbuf **rx_pkts,
 	vector_unsigned_long_long ptype0 = vec_mergel(descs[0], descs[1]);
 	vector_unsigned_long_long ptype1 = vec_mergel(descs[2], descs[3]);
 
-	ptype0 = vec_srl(ptype0, (vector_unsigned_int){30, 30, 30, 30});
-	ptype1 = vec_srl(ptype1, (vector_unsigned_int){30, 30, 30, 30});
+	//ptype0 = vec_srl(ptype0, (vector_unsigned_int){30, 30, 30, 30});
+	ptype0[0] = ptype0[0] >> 30;
+	ptype0[1] = ptype0[1] >> 30;
+
+	//ptype1 = vec_srl(ptype1, (vector_unsigned_int){30, 30, 30, 30});
+	ptype1[0] = ptype1[0] >> 30;
+	ptype1[1] = ptype1[1] >> 30;
 
 	rx_pkts[0]->packet_type =
 		ptype_tbl[(*(vector_unsigned_char *)&ptype0)[0]];
@@ -331,13 +345,20 @@ _recv_raw_pkts_vec(struct i40e_rx_queue *rxq, struct rte_mbuf **rx_pkts,
 		rte_compiler_barrier();
 
 		/* pkt 3,4 shift the pktlen field to be 16-bit aligned*/
-		const vector_unsigned_int len3 = vec_sll(
-			vec_xld2(0, (unsigned int *)&descs[3]),
-			(vector_unsigned_int){0, 0, 0, PKTLEN_SHIFT});
+		//const vector_unsigned_int len3 = vec_sll(
+		//	vec_xld2(0, (unsigned int *)&descs[3]),
+		//	(vector_unsigned_int){0, 0, 0, PKTLEN_SHIFT});
 
-		const vector_unsigned_int len2 = vec_sll(
-			vec_xld2(0, (unsigned int *)&descs[2]),
-			(vector_unsigned_int){0, 0, 0, PKTLEN_SHIFT});
+		vector_unsigned_int len3_temp = vec_xld2(0, (unsigned int *)&descs[3]);
+		len3_temp[3] = len3_temp[3] << PKTLEN_SHIFT;
+		const vector_unsigned_int len3 = len3_temp;
+
+		//const vector_unsigned_int len2 = vec_sll(
+		//	vec_xld2(0, (unsigned int *)&descs[2]),
+		//	(vector_unsigned_int){0, 0, 0, PKTLEN_SHIFT});
+		vector_unsigned_int len2_temp = vec_xld2(0, (unsigned int *)&descs[2]);
+		len2_temp[3] = len2_temp[3] << PKTLEN_SHIFT;
+		const vector_unsigned_int len2 = len2_temp;
 
 		/* merge the now-aligned packet length fields back in */
 		descs[3] = (vector_unsigned_long_long)len3;
