@@ -6,6 +6,7 @@
 #include <string.h>
 #include <inttypes.h>
 #include <netinet/in.h>
+#include <rte_byteorder.h>
 
 #ifndef __linux__
 #ifndef __FreeBSD__
@@ -22,6 +23,7 @@
 
 #include "test_cmdline.h"
 
+#if RTE_BYTE_ORDER == RTE_LITTLE_ENDIAN
 #define IP4(a,b,c,d) {((uint32_t)(((a) & 0xff)) | \
 					   (((b) & 0xff) << 8) | \
 					   (((c) & 0xff) << 16)  | \
@@ -29,6 +31,15 @@
 
 #define U16_SWAP(x) \
 		(((x & 0xFF) << 8) | ((x & 0xFF00) >> 8))
+
+#else
+#define IP4(a,b,c,d) {((uint32_t)(((a) & 0xff) << 24) | \
+					   (((b) & 0xff) << 16) | \
+					   (((c) & 0xff) << 8)  | \
+					   ((d) & 0xff))}
+
+#define U16_SWAP(x) x
+#endif
 
 /* create IPv6 address, swapping bytes where needed */
 #ifndef s6_addr16
