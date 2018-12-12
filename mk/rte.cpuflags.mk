@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: BSD-3-Clause
-# Copyright(c) 2010-2014 Intel Corporation
+# Copyright(c) 2010, 2018 Intel Corporation, IBM Corporation
 
 # this makefile is called from the generic rte.vars.mk and is
 # used to set the RTE_CPUFLAG_* environment variables giving details
@@ -86,6 +86,11 @@ endif
 
 ifneq ($(filter $(AUTO_CPUFLAGS),__builtin_vsx_xvnmaddadp),)
 CPUFLAGS += VSX
+endif
+
+# s390x
+ifneq ($(filter $(AUTO_CPUFLAGS),__s390x__),)
+CPUFLAGS += S390X
 endif
 
 # ARM flags

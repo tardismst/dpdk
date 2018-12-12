@@ -1,5 +1,5 @@
 /* SPDX-License-Identifier: BSD-3-Clause
- * Copyright(c) 2010-2016 Intel Corporation
+ * Copyright(c) 2010, 2018 Intel Corporation, IBM Corporation
  */
 
 #include <stdio.h>
@@ -240,6 +240,14 @@ em_mask_key(void *key, xmm_t mask)
 	xmm_t data = vec_ld(0, (xmm_t *)(key));
 
 	return vec_and(data, mask);
+}
+#elif defined(RTE_MACHINE_CPUFLAG_S390X)
+static inline xmm_t
+em_mask_key(void *key, xmm_t mask)
+{
+	xmm_t data = (xmm_t) vec_xld2(0, (unsigned int *)(key));
+
+	return data + mask;
 }
 #else
 #error No vector engine (SSE, NEON, ALTIVEC) available, check your toolchain
