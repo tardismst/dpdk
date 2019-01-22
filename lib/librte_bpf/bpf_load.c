@@ -1,5 +1,5 @@
 /* SPDX-License-Identifier: BSD-3-Clause
- * Copyright(c) 2018 Intel Corporation
+ * Copyright(c) 2018, 2019 Intel Corporation, IBM Corporation
  */
 
 #include <stdarg.h>
@@ -68,7 +68,7 @@ rte_bpf_load(const struct rte_bpf_prm *prm)
 		return NULL;
 	}
 
-	rc = bpf_validate(bpf);
+	rc = bpf_validate_dpdk(bpf);
 	if (rc == 0) {
 		bpf_jit(bpf);
 		if (mprotect(bpf, bpf->sz, PROT_READ) != 0)

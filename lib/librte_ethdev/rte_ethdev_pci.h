@@ -1,7 +1,8 @@
 /*-
  *   BSD LICENSE
  *
- *   Copyright(c) 2017 Brocade Communications Systems, Inc.
+ *   Copyright(c) 2017, 2019 Brocade Communications Systems, Inc.,
+ *   IBM Corporation
  *   Author: Jan Blunck <jblunck@infradead.org>
  *
  *   Redistribution and use in source and binary forms, with or without
@@ -72,7 +73,7 @@ rte_eth_copy_pci_info(struct rte_eth_dev *eth_dev,
 
 static inline int
 eth_dev_pci_specific_init(struct rte_eth_dev *eth_dev, void *bus_device) {
-	struct rte_pci_device *pci_dev = bus_device;
+	struct rte_pci_device *pci_dev = (struct rte_pci_device *) bus_device;
 
 	if (!pci_dev)
 		return -ENODEV;

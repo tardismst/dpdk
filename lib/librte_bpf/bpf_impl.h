@@ -1,5 +1,5 @@
 /* SPDX-License-Identifier: BSD-3-Clause
- * Copyright(c) 2018 Intel Corporation
+ * Copyright(c) 2018, 2019 Intel Corporation, IBM Corporation
  */
 
 #ifndef _BPF_H_
@@ -21,7 +21,7 @@ struct rte_bpf {
 	uint32_t stack_sz;
 };
 
-extern int bpf_validate(struct rte_bpf *bpf);
+extern int bpf_validate_dpdk(struct rte_bpf *bpf);
 
 extern int bpf_jit(struct rte_bpf *bpf);
 

@@ -1,5 +1,5 @@
 /* SPDX-License-Identifier: BSD-3-Clause
- * Copyright(c) 2018 Intel Corporation
+ * Copyright(c) 2018, 2019 Intel Corporation, IBM Corporation
  */
 
 #include <stdarg.h>
@@ -1145,7 +1145,7 @@ evaluate(struct bpf_verifier *bvf)
 }
 
 int
-bpf_validate(struct rte_bpf *bpf)
+bpf_validate_dpdk(struct rte_bpf *bpf)
 {
 	int32_t rc;
 	struct bpf_verifier bvf;

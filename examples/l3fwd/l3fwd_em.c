@@ -1,5 +1,5 @@
 /* SPDX-License-Identifier: BSD-3-Clause
- * Copyright(c) 2010, 2018 Intel Corporation, IBM Corporation
+ * Copyright(c) 2010, 2019 Intel Corporation, IBM Corporation
  */
 
 #include <stdio.h>
@@ -241,7 +241,7 @@ em_mask_key(void *key, xmm_t mask)
 
 	return vec_and(data, mask);
 }
-#elif defined(RTE_MACHINE_CPUFLAG_S390X)
+#elif defined(RTE_MACHINE_CPUFLAG_ZARCH)
 static inline xmm_t
 em_mask_key(void *key, xmm_t mask)
 {
