@@ -1,5 +1,5 @@
 /* SPDX-License-Identifier: BSD-3-Clause
- * Copyright(c) 2010-2014 Intel Corporation
+ * Copyright(c) 2010, 2019 Intel Corporation, IBM Corporation
  */
 
 #include "acl_run.h"
@@ -140,6 +140,14 @@ rte_acl_classify_scalar(const struct rte_acl_ctx *ctx, const uint8_t **data,
 
 		input0 = GET_NEXT_4BYTES(parms, 0);
 		input1 = GET_NEXT_4BYTES(parms, 1);
+
+                /* input needs to be swapped because the rules get
+		 * swapped while building the trie.
+		 */
+#if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+		input0 = __bswap_32(input0);
+		input1 = __bswap_32(input1);
+#endif
 
 		for (n = 0; n < 4; n++) {
 
