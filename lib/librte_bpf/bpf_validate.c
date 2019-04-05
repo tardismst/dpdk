@@ -2209,7 +2209,7 @@ evaluate(struct bpf_verifier *bvf)
 }
 
 int
-bpf_validate(struct rte_bpf *bpf)
+bpf_validate_dpdk(struct rte_bpf *bpf)
 {
 	int32_t rc;
 	struct bpf_verifier bvf;
