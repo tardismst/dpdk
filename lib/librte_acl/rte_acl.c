@@ -63,6 +63,7 @@ static const rte_acl_classify_t classify_fns[] = {
 	[RTE_ACL_CLASSIFY_AVX2] = rte_acl_classify_avx2,
 	[RTE_ACL_CLASSIFY_NEON] = rte_acl_classify_neon,
 	[RTE_ACL_CLASSIFY_ALTIVEC] = rte_acl_classify_altivec,
+	[RTE_ACL_CLASSIFY_S390X] = rte_acl_classify_scalar, /* use scalar for now */
 };
 
 /* by default, use always available scalar code path. */
@@ -102,6 +103,8 @@ RTE_INIT(rte_acl_init)
 		alg =  RTE_ACL_CLASSIFY_NEON;
 #elif defined(RTE_ARCH_PPC_64)
 	alg = RTE_ACL_CLASSIFY_ALTIVEC;
+#elif defined(RTE_ARCH_S390X)
+	alg = RTE_ACL_CLASSIFY_S390X;
 #else
 #ifdef CC_AVX2_SUPPORT
 	if (rte_cpu_get_flag_enabled(RTE_CPUFLAG_AVX2))
