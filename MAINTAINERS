@@ -248,6 +248,15 @@ F: lib/librte_eal/common/include/arch/ppc_64/
 F: drivers/net/i40e/i40e_rxtx_vec_altivec.c
 F: examples/l3fwd/*altivec.h
 
+Linux on IBM Z (s390x)
+M: Vivian Kong <vivkong@ca.ibm.com.com>
+F: lib/librte_eal/common/arch/s390x/
+F: lib/librte_eal/common/include/arch/s390x/
+F: lib/librte_lpm/rte_lpm_s390x.h
+F: drivers/net/i40e/i40e_rxtx_vec_s390x.c
+F: examples/l3fwd/*s390x.h
+F: mk/arch/s390x/rte.vars.mk
+
 Intel x86
 M: Bruce Richardson <bruce.richardson@intel.com>
 M: Konstantin Ananyev <konstantin.ananyev@intel.com>

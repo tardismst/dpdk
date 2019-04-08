@@ -160,6 +160,9 @@ New Features
   Improved testpmd application performance on ARM platform. For ``macswap``
   forwarding mode, NEON intrinsics were used to do swap to save CPU cycles.
 
+* **Added support for Linux on IBM Z (s390x).**
+
+  Added initial support for Linux on IBM Z (s390x).
 
 Removed Items
 -------------
