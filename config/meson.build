@@ -53,6 +53,8 @@ if machine == 'default'
 		machine = 'default'
 	elif host_machine.cpu_family().startswith('ppc')
 		machine = 'power8'
+	elif host_machine.cpu_family().startswith('s390x')
+		machine = 'z13'
 	endif
 endif
 
@@ -158,6 +160,8 @@ elif host_machine.cpu_family().startswith('arm') or host_machine.cpu_family().st
 	arch_subdir = 'arm'
 elif host_machine.cpu_family().startswith('ppc')
 	arch_subdir = 'ppc_64'
+elif host_machine.cpu_family().startswith('s390x')
+	arch_subdir = 's390x'
 endif
 subdir(arch_subdir)
 dpdk_conf.set('RTE_COMPILE_TIME_CPUFLAGS', ','.join(compile_time_cpuflags))
