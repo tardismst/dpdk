@@ -353,4 +353,6 @@ test_lf_stack_perf(void)
 }
 
 REGISTER_TEST_COMMAND(stack_perf_autotest, test_stack_perf);
+#if !defined(RTE_ARCH_S390X) //not supported
 REGISTER_TEST_COMMAND(stack_lf_perf_autotest, test_lf_stack_perf);
+#endif

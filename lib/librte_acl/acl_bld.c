@@ -777,6 +777,16 @@ acl_build_reset(struct rte_acl_ctx *ctx)
 		sizeof(*ctx) - offsetof(struct rte_acl_ctx, num_categories));
 }
 
+static uint32_t get_le_byte_index(uint32_t index, int size)
+{
+#if  __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+	(void) size;
+	return index;
+#else
+	return size - 1 - index;
+#endif
+}
+
 static void
 acl_gen_range(struct acl_build_context *context,
 	const uint8_t *hi, const uint8_t *lo, int size, int level,
@@ -786,12 +796,19 @@ acl_gen_range(struct acl_build_context *context,
 	uint32_t n;
 
 	prev = root;
+
+	/* On big endian min and max point to highest byte.
+	 * Therefore iterate in opposite direction as on
+	 * little endian with helper function.
+	 */
 	for (n = size - 1; n > 0; n--) {
+		uint32_t le_idx = get_le_byte_index(n, size);
 		node = acl_alloc_node(context, level++);
-		acl_add_ptr_range(context, prev, node, lo[n], hi[n]);
+		acl_add_ptr_range(context, prev, node, lo[le_idx], hi[le_idx]);
 		prev = node;
 	}
-	acl_add_ptr_range(context, prev, end, lo[0], hi[0]);
+	const uint32_t first_idx = get_le_byte_index(0, size);
+	acl_add_ptr_range(context, prev, end, lo[first_idx], hi[first_idx]);
 }
 
 static struct rte_acl_node *
@@ -804,10 +821,16 @@ acl_gen_range_trie(struct acl_build_context *context,
 	const uint8_t *lo = min;
 	const uint8_t *hi = max;
 
+	/* On big endian min and max point to highest byte.
+	 * Therefore iterate in opposite direction as on
+	 * little endian.
+	 */
+	const int byte_index = get_le_byte_index(size-1, size);
+
 	*pend = acl_alloc_node(context, level+size);
 	root = acl_alloc_node(context, level++);
 
-	if (lo[size - 1] == hi[size - 1]) {
+	if (lo[byte_index] == hi[byte_index]) {
 		acl_gen_range(context, hi, lo, size, level, root, *pend);
 	} else {
 		uint8_t limit_lo[64];
@@ -819,27 +842,29 @@ acl_gen_range_trie(struct acl_build_context *context,
 		memset(limit_hi, UINT8_MAX, RTE_DIM(limit_hi));
 
 		for (n = size - 2; n >= 0; n--) {
-			hi_ff = (uint8_t)(hi_ff & hi[n]);
-			lo_00 = (uint8_t)(lo_00 | lo[n]);
+			const uint32_t le_idx = get_le_byte_index(n, size);
+			hi_ff = (uint8_t)(hi_ff & hi[le_idx]);
+			lo_00 = (uint8_t)(lo_00 | lo[le_idx]);
 		}
 
 		if (hi_ff != UINT8_MAX) {
-			limit_lo[size - 1] = hi[size - 1];
+			limit_lo[byte_index] = hi[byte_index];
 			acl_gen_range(context, hi, limit_lo, size, level,
 				root, *pend);
 		}
 
 		if (lo_00 != 0) {
-			limit_hi[size - 1] = lo[size - 1];
+			limit_hi[byte_index] = lo[byte_index];
 			acl_gen_range(context, limit_hi, lo, size, level,
 				root, *pend);
 		}
 
-		if (hi[size - 1] - lo[size - 1] > 1 ||
+		if (hi[byte_index] - lo[byte_index] > 1 ||
 				lo_00 == 0 ||
 				hi_ff == UINT8_MAX) {
-			limit_lo[size-1] = (uint8_t)(lo[size-1] + (lo_00 != 0));
-			limit_hi[size-1] = (uint8_t)(hi[size-1] -
+			limit_lo[byte_index] = (uint8_t)(lo[byte_index] +
+				(lo_00 != 0));
+			limit_hi[byte_index] = (uint8_t)(hi[byte_index] -
 				(hi_ff != UINT8_MAX));
 			acl_gen_range(context, limit_hi, limit_lo, size,
 				level, root, *pend);
@@ -863,13 +888,17 @@ acl_gen_mask_trie(struct acl_build_context *context,
 	root = acl_alloc_node(context, level++);
 	prev = root;
 
+	/* On big endian val and msk point to highest byte.
+	 * Therefore iterate in opposite direction as on
+	 * little endian with helper function
+	 */
 	for (n = size - 1; n >= 0; n--) {
+		uint32_t le_idx = get_le_byte_index(n, size);
 		node = acl_alloc_node(context, level++);
-		acl_gen_mask(&bits, val[n] & msk[n], msk[n]);
+		acl_gen_mask(&bits, val[le_idx] & msk[le_idx], msk[le_idx]);
 		acl_add_ptr(context, prev, node, &bits);
 		prev = node;
 	}
-
 	*pend = prev;
 	return root;
 }
@@ -926,6 +955,14 @@ build_trie(struct acl_build_context *context, struct rte_acl_build_rule *head,
 				mask = RTE_ACL_MASKLEN_TO_BITMASK(
 					fld->mask_range.u32,
 					rule->config->defs[n].size);
+
+				/* Fields are aligned highest to lowest bit.
+				 * Masked needs to be shifted to follow same
+				 * convention
+				 */
+#if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+				mask = mask << 32;
+#endif
 
 				/* gen a mini-trie for this field */
 				merge = acl_gen_mask_trie(context,
@@ -1017,6 +1054,14 @@ acl_calc_wildness(struct rte_acl_build_rule *head,
 			uint32_t bit_len = CHAR_BIT * config->defs[n].size;
 			uint64_t msk_val = RTE_LEN2MASK(bit_len,
 				typeof(msk_val));
+
+			/* Fields are aligned highest to lowest bit.
+			 * Masked needs to be shifted to follow same
+			 * convention
+			 */
+			if (__BYTE_ORDER__ == __ORDER_BIG_ENDIAN__)
+				msk_val <<= 32;
+
 			double size = bit_len;
 			int field_index = config->defs[n].field_index;
 			const struct rte_acl_field *fld = rule->f->field +

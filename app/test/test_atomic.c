@@ -17,6 +17,7 @@
 #include <rte_lcore.h>
 #include <rte_random.h>
 #include <rte_hash_crc.h>
+#include <rte_byteorder.h>
 
 #include "test.h"
 
@@ -597,6 +598,7 @@ test_atomic(void)
 	}
 #endif
 
+#if RTE_BYTE_ORDER == RTE_LITTLE_ENDIAN
 	/*
 	 * Test 16/32/64bit atomic exchange.
 	 */
@@ -628,7 +630,7 @@ test_atomic(void)
 		printf("Atomic exchange test failed\n");
 		return -1;
 	}
-
+#endif
 	return 0;
 }
 REGISTER_TEST_COMMAND(atomic_autotest, test_atomic);

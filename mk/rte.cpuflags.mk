@@ -97,6 +97,11 @@ ifneq ($(filter $(AUTO_CPUFLAGS),__builtin_vsx_xvnmaddadp),)
 CPUFLAGS += VSX
 endif
 
+# s390x
+ifneq ($(filter $(AUTO_CPUFLAGS),__s390x__),)
+CPUFLAGS += ZARCH
+endif
+
 # ARM flags
 ifneq ($(filter __ARM_NEON __aarch64__,$(AUTO_CPUFLAGS)),)
 CPUFLAGS += NEON

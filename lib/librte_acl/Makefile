@@ -28,6 +28,8 @@ CFLAGS_acl_run_neon.o += -Wno-maybe-uninitialized
 endif
 else ifeq ($(CONFIG_RTE_ARCH_PPC_64),y)
 SRCS-$(CONFIG_RTE_LIBRTE_ACL) += acl_run_altivec.c
+else ifeq ($(CONFIG_RTE_ARCH_S390X),y)
+SRCS-$(CONFIG_RTE_LIBRTE_ACL) +=
 else
 SRCS-$(CONFIG_RTE_LIBRTE_ACL) += acl_run_sse.c
 endif
