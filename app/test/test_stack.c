@@ -416,11 +416,13 @@ test_stack(void)
 	return __test_stack(0);
 }
 
+#ifndef RTE_ARCH_S390X
 static int
 test_lf_stack(void)
 {
 	return __test_stack(RTE_STACK_F_LF);
 }
+#endif
 
 REGISTER_TEST_COMMAND(stack_autotest, test_stack);
 #if !defined(RTE_ARCH_S390X) //not supported

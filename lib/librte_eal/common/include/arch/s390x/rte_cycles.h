@@ -23,7 +23,7 @@ static inline uint64_t
 rte_rdtsc(void)
 {
 	uint64_t tsc;
-	asm volatile("stck %0" : "=Q"(tsc) : : "cc");
+	asm volatile("stckf %0" : "=Q"(tsc) : : "cc");
 	return tsc;
 }
 

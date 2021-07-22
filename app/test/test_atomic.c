@@ -352,6 +352,7 @@ volatile uint16_t token16;
 volatile uint32_t token32;
 volatile uint64_t token64;
 
+#ifndef RTE_ARCH_S390X
 static void
 build_crc8_table(void)
 {
@@ -442,6 +443,8 @@ test_atomic_exchange(__attribute__((unused)) void *arg)
 
 	return 0;
 }
+#endif
+
 static int
 test_atomic(void)
 {

@@ -507,7 +507,11 @@ __mlx5_uar_write64_relaxed(uint64_t val, void *addr,
 			   rte_spinlock_t *lock __rte_unused)
 {
 #ifdef RTE_ARCH_64
+#ifndef RTE_ARCH_S390X
 	*(uint64_t *)addr = val;
+#else
+        rte_write64_relaxed(val, addr);
+#endif
 #else /* !RTE_ARCH_64 */
 	rte_spinlock_lock(lock);
 	*(uint32_t *)addr = val;
