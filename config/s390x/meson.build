@@ -6,6 +6,7 @@ if not dpdk_conf.get('RTE_ARCH_64')
 endif
 dpdk_conf.set('RTE_ARCH', 's390x')
 dpdk_conf.set('RTE_ARCH_S390X', 1)
+dpdk_conf.set('RTE_MACHINE_CPUFLAG_ZARCH', 1)
 
 dpdk_conf.set('RTE_FORCE_INTRINSICS', 1)
 
