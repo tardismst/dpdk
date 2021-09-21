@@ -733,7 +733,15 @@ rxq_cq_to_pkt_type(struct mlx5_rxq_data *rxq, volatile struct mlx5_cqe *cqe)
 {
 	uint8_t idx;
 	uint8_t pinfo = cqe->pkt_info;
-	uint16_t ptype = cqe->hdr_type_etc;
+
+        /* 
+         * hdr_type_etc is from the cqe thus it is BE
+         * the logic below did not convert BE -> LE prior
+         * to using the value of it.  So the logic below
+         * is written for LE thus the value of hdr_type_etc has
+         * to be converted from LE to BE for the logic to work
+        */
+        uint16_t ptype = rte_le_to_cpu_16(cqe->hdr_type_etc);
 
 	/*
 	 * The index to the array should have:
